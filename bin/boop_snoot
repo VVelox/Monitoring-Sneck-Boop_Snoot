@@ -21,6 +21,8 @@ boop_snoot <args> <host>
 
 -s                       Do not Sort the keys.
 
+-d                       Print all of it and not just .data
+
 -v <version >            Version to use. 1, 2c, or 3
                          Default: 2c
 
@@ -59,6 +61,7 @@ my $u;
 my $x;
 my $X;
 my $Z;
+my $data;
 my $prog_version;
 my $help;
 my $pretty;
@@ -82,7 +85,8 @@ GetOptions(
 	'X=s'     => \$X,
 	'Z=s'     => \$Z,
 	's'       => \$sort,
-	'p'       => \$pretty,
+		   'p'       => \$pretty,
+		   'd'=>\$data,
 );
 
 # print version or help if requested
@@ -133,6 +137,13 @@ if ($@) {
 }
 
 my $new_json=JSON->new->utf8;
+
+if (!$data) {
+	if (!defined($json->{data})) {
+		die( 'The returned JSON lacks a $json->{data} section....  ' . $raw_json );
+	}
+	$json=$json->{data};
+}
 
 if (!$pretty) {
 	$new_json->pretty(1);

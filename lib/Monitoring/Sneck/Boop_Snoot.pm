@@ -144,7 +144,7 @@ sub boop_the_snoot {
 	}
 
 	# clean it up incase it is on a system that quotes everything
-	$returned =~ s/\\([^n\\])/($1)/g;
+	$returned =~ s/\\([^nbfrt\\])/($1)/g;
 	$returned =~ s/^\"//;
 	$returned =~ s/\"$//;
 	my ( $oid, $json ) = split( '\ ', $returned, 2 );
