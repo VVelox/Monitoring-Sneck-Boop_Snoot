@@ -1,0 +1,149 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON;
+use Monitoring::Sneck::Boop_Snoot;
+
+sub prog_version {
+	print "sneck v. 0.0.1\n";
+}
+
+sub help {
+	&proc_version;
+
+	print '
+
+boop_snoot <args> <host>
+
+-p                       Do not pretty print.
+
+-s                       Do not Sort the keys.
+
+-v <version >            Version to use. 1, 2c, or 3
+                         Default: 2c
+
+SNMP Version 1 or 2c specific
+-c <community>           SNMP community stream.
+                         Default: public
+
+SNMP Version 3
+-a <value>               Set authentication protocol (MD5|SHA|SHA-224|SHA-256|SHA-384|SHA-512)
+-A <value>               Set authentication protocol pass phrase
+-e <value>               Set security engine ID (e.g. 800000020109840301)
+-E <value>               Set context engine ID (e.g. 800000020109840301)
+-l <value>               Set security level (noAuthNoPriv|authNoPriv|authPriv)
+-n <value>               Set context name (e.g. bridge1)
+-u <value>               Set security name (e.g. bert)
+-x <value>               Set privacy protocol (DES|AES)
+-X <value>               Set privacy protocol pass phrase
+-Z <value>               Set destination engine boots/time
+
+-h                       Print help info.
+--help                   Print help info.
+--version                Print version info.
+
+';
+}
+
+my $community = 'public';
+my $version   = '2c';
+my $a;
+my $A;
+my $e;
+my $E;
+my $l;
+my $n;
+my $u;
+my $x;
+my $X;
+my $Z;
+my $prog_version;
+my $help;
+my $pretty;
+my $sort;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$prog_version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'c=s'     => \$community,
+	'a=s'     => \$a,
+	'A=s'     => \$A,
+	'e=s'     => \$e,
+	'E=s'     => \$E,
+	'l=s'     => \$l,
+	'n=s'     => \$n,
+	'u=s'     => \$u,
+	'x=s'     => \$x,
+	'X=s'     => \$X,
+	'Z=s'     => \$Z,
+	's'       => \$sort,
+	'p'       => \$pretty,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($prog_version) {
+	&prog_version;
+	exit 42;
+}
+
+# make sure we have a host
+if ( !defined( $ARGV[0] ) ) {
+	die('No host specified');
+}
+
+use Monitoring::Sneck::Boop_Snoot;
+
+my $sneck_snoot_booper = Monitoring::Sneck::Boop_Snoot->new(
+	{
+		version   => $version,
+		community => $community,
+		a         => $a,
+		A         => $A,
+		e         => $e,
+		E         => $E,
+		l         => $l,
+		n         => $n,
+		u         => $u,
+		x         => $x,
+		X         => $X,
+		Z         => $Z,
+	}
+);
+
+my $raw_json = $sneck_snoot_booper->boop_the_snoot( $ARGV[0] );
+
+# was told to raw print it, so just print and exit
+if ($sort && $pretty) {
+	print $raw_json."\n";
+}
+
+my $json;
+eval { $json = decode_json($raw_json); };
+if ($@) {
+	die( 'Failed to decode the returned JSON....  ' . $raw_json . '    ... ' . $@ );
+}
+
+my $new_json=JSON->new->utf8;
+
+if (!$pretty) {
+	$new_json->pretty(1);
+}
+
+if (!$sort) {
+	$new_json->canonical(1);
+}
+
+print $new_json->encode($json);
+
+if ($pretty) {
+	print "\n";
+}
