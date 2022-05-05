@@ -27,7 +27,6 @@ our $VERSION = '0.0.1';
                                                    });
 
 
-
 =head1 METHODS
 
 =head2 new
@@ -86,7 +85,13 @@ sub new {
 
 =head2 boop_the_snoot
 
+Fetches the data for the host and returns it.
 
+One option is taken and that is the hostname to poll.
+
+This will die on snmpget failure.
+
+    my $raw_json=$$sneck_snoot_booper->boop_the_snoot($host);
 
 =cut
 

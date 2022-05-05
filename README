@@ -1,6 +1,8 @@
 Monitoring-Sneck-Boop_Snoot
 
-
+This his basically a wrapper for smpget and nicely formatting
+the returned output. Also saves one the headache of having to
+remember the OID or have it handy.
 
 INSTALLATION
 

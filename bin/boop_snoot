@@ -1,5 +1,91 @@
 #!/usr/bin/env perl
 
+=head1 NAME
+
+boop_snoot - fetches the results of sneck extend via SNMP.
+
+=head1 SYNOPSIS
+
+boop_snoot [B<-v> 1] [B<-c> <community>] [B<-p>] [B<-s>] [B<-d>]] <host>
+
+boop_snoot [B<-v> 2c] [B<-c> <community>] [B<-p>] [B<-s>] [B<-d>]] <host>
+
+boop_snoot [B<-v> 3] [B<-a> <value>] [B<-A> <value>] [B<-e> <value>] [B<-E> <value>] [B<-l> <value>] [B<-n> <value>] [B<-u> <value>] [B<-x> <value>] [B<-X> <value>] [B<-Z> <value>] [B<-p>] [B<-s>] [B<-d>]] <host>
+
+=head1 DESCRIPTION
+
+This his basically a wrapper for smpget and nicely formatting
+the returned output.
+
+=head1 GENERAL FLAGS
+
+=head2 -p
+
+Do not pretty print the return. Just prints the raw return,
+provided -s and -d is given.
+
+=head2 -s
+
+Do not sort the JSON keys.
+
+=head2 -d
+
+Only print the data hash in the JSON.
+
+=head1 SNMP 1/2c FLAGS
+
+=head2 -v <version>
+
+SNMP version to use, 1, 2c, or 3. Defaults to 2c.
+
+=head2 -c <community>
+
+SNMP community to use for 2c or 3.
+
+=head1 SNMP 3 FLAGS
+
+=head2 -a <value>
+
+Set authentication protocol (MD5|SHA|SHA-224|SHA-256|SHA-384|SHA-512)
+
+=head2 -A <value>
+
+Set authentication protocol pass phrase
+
+=head2 -e <value>
+
+Set security engine ID (e.g. 800000020109840301)
+
+=head2 -E <value>
+
+Set context engine ID (e.g. 800000020109840301)
+
+=head2 -l <value>
+
+Set security level (noAuthNoPriv|authNoPriv|authPriv)
+
+=head2 -n <value>
+
+Set context name (e.g. bridge1)
+
+=head2 -u <value>
+
+Set security name (e.g. bert)
+
+=head2 -x <value>
+
+Set privacy protocol (DES|AES)
+
+=head2 -X <value>
+
+Set privacy protocol pass phrase
+
+=head2 -Z <value>
+
+Set destination engine boots/time
+
+=cut
+
 use strict;
 use warnings;
 use Getopt::Long;
@@ -11,7 +97,7 @@ sub prog_version {
 }
 
 sub help {
-	&proc_version;
+	&prog_version;
 
 	print '
 
@@ -85,8 +171,8 @@ GetOptions(
 	'X=s'     => \$X,
 	'Z=s'     => \$Z,
 	's'       => \$sort,
-		   'p'       => \$pretty,
-		   'd'=>\$data,
+	'p'       => \$pretty,
+	'd'       => \$data,
 );
 
 # print version or help if requested
@@ -126,8 +212,8 @@ my $sneck_snoot_booper = Monitoring::Sneck::Boop_Snoot->new(
 my $raw_json = $sneck_snoot_booper->boop_the_snoot( $ARGV[0] );
 
 # was told to raw print it, so just print and exit
-if ($sort && $pretty) {
-	print $raw_json."\n";
+if ( $sort && $pretty ) {
+	print $raw_json. "\n";
 }
 
 my $json;
@@ -136,20 +222,20 @@ if ($@) {
 	die( 'Failed to decode the returned JSON....  ' . $raw_json . '    ... ' . $@ );
 }
 
-my $new_json=JSON->new->utf8;
+my $new_json = JSON->new->utf8;
 
-if (!$data) {
-	if (!defined($json->{data})) {
+if ( !$data ) {
+	if ( !defined( $json->{data} ) ) {
 		die( 'The returned JSON lacks a $json->{data} section....  ' . $raw_json );
 	}
-	$json=$json->{data};
+	$json = $json->{data};
 }
 
-if (!$pretty) {
+if ( !$pretty ) {
 	$new_json->pretty(1);
 }
 
-if (!$sort) {
+if ( !$sort ) {
 	$new_json->canonical(1);
 }
 
