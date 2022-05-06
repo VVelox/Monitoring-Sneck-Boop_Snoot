@@ -11,11 +11,11 @@ Monitoring::Sneck::Boop_Snoot -  Boop the Monitoring::Sneck's snoot via SNMP
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -149,10 +149,12 @@ sub boop_the_snoot {
 	}
 
 	# clean it up incase it is on a system that quotes everything
-	$returned =~ s/\\([^nbfrt\\])/($1)/g;
+	$returned =~ s/\\([^nbfrt\\])/$1/g;
 	$returned =~ s/^\"//;
 	$returned =~ s/\"$//;
-	my ( $oid, $json ) = split( '\ ', $returned, 2 );
+	my ( $oid, $json ) = split( /\ +/, $returned, 2 );
+	$json =~ s/^\"//;
+	$json =~ s/\"$//;
 
 	return $json;
 }
