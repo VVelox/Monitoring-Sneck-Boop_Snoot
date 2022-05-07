@@ -11,11 +11,11 @@ Monitoring::Sneck::Boop_Snoot -  Boop the Monitoring::Sneck's snoot via SNMP
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 =head1 SYNOPSIS
 

@@ -102,7 +102,7 @@ use JSON;
 use Monitoring::Sneck::Boop_Snoot;
 
 sub prog_version {
-	print "sneck v. 0.1.0\n";
+	print "sneck v. 0.1.1\n";
 }
 
 sub help {
@@ -289,7 +289,7 @@ if ($nagios) {
 	}
 	else {
 		print 'OK: ' . $alertstring;
-		exit 1;
+		exit 0;
 	}
 
 }
